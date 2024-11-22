@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+import java.util.Arrays;
+import java.util.Base64;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,7 +17,9 @@ UserRepo userRepo;
 
     @Override
     public boolean logIn(String email, String password) {
-        User user=userRepo.findByEmailAndPassword(email,password);
+        byte[] decodePassword=Base64.getDecoder().decode(password);
+        User user=userRepo.findByEmailAndPassword(email, Arrays.toString(decodePassword));
+       // User user=userRepo.findByEmailAndPassword(email, password);
         return user!=null;
     }
 
@@ -23,7 +27,12 @@ UserRepo userRepo;
     public void register(String name, String password, String contactNo, String email)
     {
         System.out.println(name+"\t222222\t"+password);
-        User user=new User(name,password,email,contactNo);
+        String encodePassword = Base64.getEncoder().encodeToString(password.getBytes());
+        User user=new User(name,encodePassword,email,contactNo);
+        //User user=new User(name,password,email,contactNo);
         userRepo.save(user);
     }
+
+
+
 }
